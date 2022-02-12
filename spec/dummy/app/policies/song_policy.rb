@@ -1,0 +1,2 @@
+class SongPolicy < ApplicationPolicy
+end

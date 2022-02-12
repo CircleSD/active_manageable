@@ -1,0 +1,52 @@
+# GitHub actions workflow using a matrix to test all stable releases of Ruby
+# with the different releases of ActiveRecord & ActiveSupport using the Appraisals gemfiles
+# References
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-ruby
+# https://github.com/ruby/setup-ruby#matrix-of-gemfiles
+# https://technology.customink.com/blog/2019/09/02/from-travis-ci-to-github-actions/
+# https://bibwild.wordpress.com/2020/11/12/deep-dive-moving-ruby-projects-from-travis-to-github-actions-for-ci/
+# https://github.com/jrochkind/attr_json/blob/a3f38f01dc641bc0486442ec6ff4351e18ab4a03/.github/workflows/ci.yml
+name: CI
+
+on: [push,pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false # should GitHub cancel all in-progress jobs if any matrix job fails
+      matrix:
+        ruby-version: ['2.7']
+        gemfile: ['rails_6_0']
+        include:
+          - ruby-version: '2.7'
+            gemfile: 'rails_6_1'
+          - ruby-version: '2.7'
+            gemfile: 'rails_7_0'
+          - ruby-version: '3.0'
+            gemfile: 'rails_6_0'
+          - ruby-version: '3.0'
+            gemfile: 'rails_6_1'
+          - ruby-version: '3.0'
+            gemfile: 'rails_7_0'
+          - ruby-version: '3.1'
+            gemfile: 'rails_6_1'
+          - ruby-version: '3.1'
+            gemfile: 'rails_7_0'
+
+    env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Ruby ${{ matrix.ruby-version }} and bundle ${{ matrix.gemfile }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+    - name: Run the tests
+      run: bundle exec rspec

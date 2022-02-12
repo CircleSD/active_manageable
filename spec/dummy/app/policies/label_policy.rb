@@ -1,0 +1,2 @@
+class LabelPolicy < ApplicationPolicy
+end

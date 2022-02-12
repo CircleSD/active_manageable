@@ -1,0 +1,42 @@
+# .rubocop.yml
+
+# Based article from Evil Martians
+# https://evilmartians.com/chronicles/rubocoping-with-legacy-bring-your-ruby-code-up-to-standard
+# referenced in standard readme relating to use of Standard with Rubocop extensions
+# https://github.com/testdouble/standard
+
+# We want Exclude directives from different
+# config files to get merged, not overwritten
+inherit_mode:
+  merge:
+    - Exclude
+
+require:
+  # Performance cops are bundled with Standard
+  - rubocop-performance
+  # Standard's config uses this custom cop,
+  # so it must be loaded
+  - standard/cop/block_single_line_braces
+
+inherit_gem:
+  standard: config/base.yml
+
+inherit_from:
+  - .rubocop_rails.yml
+  - .rubocop_rspec.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.7
+  Exclude:
+    - "spec/dummy/config/*"
+    - "spec/dummy/config/environments/*"
+    - "spec/dummy/db/schema.rb"
+    - "spec/spec_helper.rb"
+
+# Exclude cop for base class with equality comparison
+# so the gem does not need a dependency on ActionPack
+Style/ClassEqualityComparison:
+  Enabled: true
+  Exclude:
+    - "lib/active_manageable/base.rb"

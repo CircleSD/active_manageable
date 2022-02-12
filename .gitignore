@@ -1,0 +1,20 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# rspec failure tracking
+.rspec_status
+
+# dummy application
+/spec/dummy/db/*.sqlite3
+/spec/dummy/log/*.log
+/spec/dummy/storage/
+/spec/dummy/tmp/
+
+# appraisals gemfile lockfiles
+/gemfiles/*.gemfile.lock
