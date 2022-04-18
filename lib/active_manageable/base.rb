@@ -89,7 +89,7 @@ module ActiveManageable
       end
 
       def add_method_defaults(key:, value:, methods:)
-        methods = Array(methods).map(&:to_sym)
+        methods = Array.wrap(methods).map(&:to_sym)
         methods << :all if methods.empty?
         defaults[key] ||= {}
         methods.each { |method| defaults[key][method] = value }

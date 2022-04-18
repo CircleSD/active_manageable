@@ -35,15 +35,14 @@ module ActiveManageable
           # and value containing an array of scope arguments.
           def get_scopes(scopes = nil)
             scopes ||= defaults[:scopes]
-            scopes = scopes.is_a?(Hash) ? [scopes] : Array(scopes)
 
-            scopes.map do |scope|
+            Array.wrap(scopes).map do |scope|
               case scope
               when Symbol, String
                 {scope => []}
               when Hash
                 # ensure values are an array so they can be passed to the scope using splat operator
-                scope.transform_values! { |v| Array(v) }
+                scope.transform_values! { |v| Array.wrap(v) }
               when Proc
                 # if the class default contains a lambda/proc that returns nil
                 # don't call get_scopes as we don't want to end up in an infinite loop
