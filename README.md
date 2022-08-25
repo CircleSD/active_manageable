@@ -733,7 +733,7 @@ After making changes:
 
 1. run `rake spec` to run the tests and check the test coverage
 2. run `open coverage/index.html` to view the test coverage report
-3. run `bundle exec appraisal install` to install the appraisal dependencies
+3. run `bundle exec appraisal install` to install the appraisal dependencies or `bundle exec appraisal update` to upgrade the appraisal dependencies
 4. run `bundle exec appraisal rspec` to run the tests against different versions of activerecord & activesupport
 5. run `bundle exec rubocop` to check the style of files
 
