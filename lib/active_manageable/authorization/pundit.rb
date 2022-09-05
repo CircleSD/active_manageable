@@ -15,7 +15,7 @@ module ActiveManageable
           ::Pundit.authorize(current_user, record, action)
         end
 
-        def scoped_class
+        def authorization_scope
           ::Pundit.policy_scope(current_user, model_class)
         end
 

@@ -13,7 +13,7 @@ module ActiveManageable
         def index(options: {})
           initialize_state(options: options)
 
-          @target = scoped_class
+          @target = authorization_scope
           authorize(record: model_class)
           search(@options[:search])
           order(@options[:order])
@@ -28,7 +28,7 @@ module ActiveManageable
 
         private
 
-        def scoped_class
+        def authorization_scope
           action_scope
         end
 

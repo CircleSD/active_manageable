@@ -2309,7 +2309,7 @@ module ActiveManageable
             end
           end
 
-          describe "#scoped_class" do
+          describe "#authorization_scope" do
             context "when the current_user does not have access to any genres" do
               it "returns no records" do
                 ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :none)
@@ -2373,7 +2373,7 @@ module ActiveManageable
             end
           end
 
-          describe "#scoped_class" do
+          describe "#authorization_scope" do
             context "when the current_user does not have access to any genres" do
               it "returns no records" do
                 ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :none)
@@ -2565,14 +2565,14 @@ module ActiveManageable
             stub_const("TestClass", test_class)
           end
 
-          it "returns records using a combination of the pundit scoped_class, ransack :search option and kaminari :page option" do
+          it "returns records using a combination of the pundit authorization_scope, ransack :search option and kaminari :page option" do
             artist = Artist.find_by(name: "New Order")
             ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :electronic)
             collection = TestClass.new.index(options: {search: {artist_id_eq: artist.id, s: "name DESC"}, page: {number: 2, size: 2}})
             expect(collection).to match_array(Album.where(artist_id: artist.id).electronic.order("name DESC").offset(2).limit(2))
           end
 
-          it "returns records using a combination of the pundit scoped_class, ransack :search option, kaminari :page option and :order, :scopes, :includes & :select options" do
+          it "returns records using a combination of the pundit authorization_scope, ransack :search option, kaminari :page option and :order, :scopes, :includes & :select options" do
             artist = Artist.find_by(name: "New Order")
             ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :electronic)
             collection = TestClass.new.index(options: {search: {artist_id_eq: artist.id}, page: {number: 2, size: 2}, order: "name DESC", scopes: [:released_in_1980s], includes: :songs, select: [:id, :name, :released_at, :genre]})
@@ -2582,7 +2582,7 @@ module ActiveManageable
           end
 
           context "when the :options contain string keys and values" do
-            it "returns records using a combination of the pundit scoped_class, ransack :search option, kaminari :page option and :order, :scopes, :includes & :select options" do
+            it "returns records using a combination of the pundit authorization_scope, ransack :search option, kaminari :page option and :order, :scopes, :includes & :select options" do
               artist = Artist.find_by(name: "New Order")
               ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :electronic)
               collection = TestClass.new.index(options: {"search" => {"artist_id_eq" => artist.id.to_s}, "page" => {"number" => "2", "size" => "2"}, "order" => "name DESC", "scopes" => ["released_in_1980s"], "includes" => "songs", "select" => ["id", "name", "released_at", "genre"]})

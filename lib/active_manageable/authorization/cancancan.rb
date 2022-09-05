@@ -15,7 +15,7 @@ module ActiveManageable
           current_ability.authorize!(action, record)
         end
 
-        def scoped_class
+        def authorization_scope
           model_class.accessible_by(current_ability)
         end
 

@@ -341,9 +341,9 @@ module ActiveManageable
           expect(tc.method(:authorize).source_location.first).to include("pundit.rb")
         end
 
-        it "includes the pundit scoped_class method" do
+        it "includes the pundit authorization_scope method" do
           tc = TestClass.new
-          expect(tc.method(:scoped_class).source_location.first).to include("pundit.rb")
+          expect(tc.method(:authorization_scope).source_location.first).to include("pundit.rb")
         end
       end
 
@@ -362,9 +362,9 @@ module ActiveManageable
           expect(tc.method(:authorize).source_location.first).to include("pundit.rb")
         end
 
-        it "includes the pundit scoped_class method" do
+        it "includes the pundit authorization_scope method" do
           tc = TestClass.new
-          expect(tc.method(:scoped_class).source_location.first).to include("pundit.rb")
+          expect(tc.method(:authorization_scope).source_location.first).to include("pundit.rb")
         end
       end
 
@@ -383,9 +383,9 @@ module ActiveManageable
           expect(tc.method(:authorize).source_location.first).to include("cancancan.rb")
         end
 
-        it "includes the cancancan scoped_class method" do
+        it "includes the cancancan authorization_scope method" do
           tc = TestClass.new
-          expect(tc.method(:scoped_class).source_location.first).to include("cancancan.rb")
+          expect(tc.method(:authorization_scope).source_location.first).to include("cancancan.rb")
         end
       end
 
