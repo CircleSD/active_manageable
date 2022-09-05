@@ -15,22 +15,22 @@ module ActiveManageable
 
     def authorization_library=(authorization_library)
       raise ArgumentError.new("Invalid authorization library") unless authorization_library_valid?(authorization_library)
-      @authorization_library = authorization_library.to_sym
+      @authorization_library = authorization_library
     end
 
     def search_library=(search_library)
       raise ArgumentError.new("Invalid search library") unless search_library_valid?(search_library)
-      @search_library = search_library.to_sym
+      @search_library = search_library
     end
 
     def pagination_library=(pagination_library)
       raise ArgumentError.new("Invalid pagination library") unless pagination_library_valid?(pagination_library)
-      @pagination_library = pagination_library.to_sym
+      @pagination_library = pagination_library
     end
 
     def default_loading_method=(default_loading_method)
       raise ArgumentError.new("Invalid method for eager loading") unless default_loading_method_valid?(default_loading_method)
-      @default_loading_method = default_loading_method.to_sym
+      @default_loading_method = default_loading_method
     end
 
     private
@@ -48,11 +48,19 @@ module ActiveManageable
     end
 
     def default_loading_method_valid?(default_loading_method)
-      option_valid?(LOADING_METHODS, default_loading_method)
+      symbol_option_valid?(LOADING_METHODS, default_loading_method)
     end
 
     def option_valid?(options, option)
-      option.present? && options.include?(option.to_s.to_sym)
+      symbol_option_valid?(options, option) || module_option_valid?(option)
+    end
+
+    def symbol_option_valid?(options, option)
+      option.is_a?(Symbol) && options.include?(option.to_s.to_sym)
+    end
+
+    def module_option_valid?(option)
+      option.is_a?(Module)
     end
   end
 end

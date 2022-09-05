@@ -58,6 +58,8 @@ module ActiveManageable
           include ActiveManageable::Authorization::Pundit
         when :cancancan
           include ActiveManageable::Authorization::CanCanCan
+        when Module
+          include ActiveManageable.configuration.authorization_library
         end
       end
 
@@ -65,6 +67,8 @@ module ActiveManageable
         case ActiveManageable.configuration.search_library
         when :ransack
           include ActiveManageable::Search::Ransack
+        when Module
+          include ActiveManageable.configuration.search_library
         end
       end
 
@@ -72,6 +76,8 @@ module ActiveManageable
         case ActiveManageable.configuration.pagination_library
         when :kaminari
           include ActiveManageable::Pagination::Kaminari
+        when Module
+          include ActiveManageable.configuration.pagination_library
         end
       end
 

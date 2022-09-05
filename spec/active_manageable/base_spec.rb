@@ -347,6 +347,27 @@ module ActiveManageable
         end
       end
 
+      context "when using the pundit authorization module" do
+        before do
+          ActiveManageable.configuration.authorization_library = ActiveManageable::Authorization::Pundit
+          test_class = Class.new(ActiveManageable::Base) do
+            manageable ActiveManageable::ALL_METHODS
+          end
+
+          stub_const("TestClass", test_class)
+        end
+
+        it "includes the pundit authorize method" do
+          tc = TestClass.new
+          expect(tc.method(:authorize).source_location.first).to include("pundit.rb")
+        end
+
+        it "includes the pundit scoped_class method" do
+          tc = TestClass.new
+          expect(tc.method(:scoped_class).source_location.first).to include("pundit.rb")
+        end
+      end
+
       context "when using the cancancan authorization library" do
         before do
           ActiveManageable.configuration.authorization_library = :cancancan
@@ -388,9 +409,49 @@ module ActiveManageable
         end
       end
 
+      context "when using the ransack search module" do
+        before do
+          ActiveManageable.configuration.search_library = ActiveManageable::Search::Ransack
+          test_class = Class.new(ActiveManageable::Base) do
+            manageable ActiveManageable::ALL_METHODS
+          end
+
+          stub_const("TestClass", test_class)
+        end
+
+        it "includes the ransack attribute" do
+          expect(TestClass.new).to respond_to(:ransack)
+        end
+
+        it "includes the ransack search method" do
+          tc = TestClass.new
+          expect(tc.method(:search).source_location.first).to include("ransack.rb")
+        end
+      end
+
       context "when using the kaminari pagination library" do
         before do
           ActiveManageable.configuration.pagination_library = :kaminari
+          test_class = Class.new(ActiveManageable::Base) do
+            manageable ActiveManageable::ALL_METHODS
+          end
+
+          stub_const("TestClass", test_class)
+        end
+
+        it "includes the kaminari default_page_size method" do
+          expect(TestClass.method(:default_page_size).source_location.first).to include("kaminari.rb")
+        end
+
+        it "includes the kaminari page method" do
+          tc = TestClass.new
+          expect(tc.method(:page).source_location.first).to include("kaminari.rb")
+        end
+      end
+
+      context "when using the kaminari pagination module" do
+        before do
+          ActiveManageable.configuration.pagination_library = ActiveManageable::Pagination::Kaminari
           test_class = Class.new(ActiveManageable::Base) do
             manageable ActiveManageable::ALL_METHODS
           end

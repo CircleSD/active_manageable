@@ -48,13 +48,13 @@ module ActiveManageable
           expect(ActiveManageable.configuration.authorization_library).to eq(:cancancan)
         end
 
-        it "converts the authorization library to a symbol" do
-          ActiveManageable.configuration.authorization_library = "pundit"
-          expect(ActiveManageable.configuration.authorization_library).to eq(:pundit)
+        it "sets the authorization library to a module" do
+          ActiveManageable.configuration.authorization_library = ActiveManageable::Authorization::Pundit
+          expect(ActiveManageable.configuration.authorization_library).to eq(ActiveManageable::Authorization::Pundit)
         end
 
-        it "raises an error when the authorization library is an invalid string" do
-          expect { ActiveManageable.configuration.authorization_library = "boom!" }.to raise_error(ArgumentError)
+        it "raises an error when the authorization library is a string" do
+          expect { ActiveManageable.configuration.authorization_library = "pundit" }.to raise_error(ArgumentError)
         end
 
         it "raises an error when the authorization library is an empty string" do
@@ -80,13 +80,13 @@ module ActiveManageable
           expect(ActiveManageable.configuration.search_library).to eq(:ransack)
         end
 
-        it "converts the search library to a symbol" do
-          ActiveManageable.configuration.search_library = "ransack"
-          expect(ActiveManageable.configuration.search_library).to eq(:ransack)
+        it "sets the search library to a module" do
+          ActiveManageable.configuration.search_library = ActiveManageable::Search::Ransack
+          expect(ActiveManageable.configuration.search_library).to eq(ActiveManageable::Search::Ransack)
         end
 
-        it "raises an error when the search library is an invalid string" do
-          expect { ActiveManageable.configuration.search_library = "boom!" }.to raise_error(ArgumentError)
+        it "raises an error when the search library is a string" do
+          expect { ActiveManageable.configuration.search_library = "ransack" }.to raise_error(ArgumentError)
         end
 
         it "raises an error when the search library is an empty string" do
@@ -112,13 +112,13 @@ module ActiveManageable
           expect(ActiveManageable.configuration.pagination_library).to eq(:kaminari)
         end
 
-        it "converts the pagination library to a symbol" do
-          ActiveManageable.configuration.pagination_library = "kaminari"
-          expect(ActiveManageable.configuration.pagination_library).to eq(:kaminari)
+        it "sets the pagination library to a module" do
+          ActiveManageable.configuration.pagination_library = ActiveManageable::Pagination::Kaminari
+          expect(ActiveManageable.configuration.pagination_library).to eq(ActiveManageable::Pagination::Kaminari)
         end
 
-        it "raises an error when the pagination library is an invalid string" do
-          expect { ActiveManageable.configuration.pagination_library = "boom!" }.to raise_error(ArgumentError)
+        it "raises an error when the pagination library is a string" do
+          expect { ActiveManageable.configuration.pagination_library = "kaminari" }.to raise_error(ArgumentError)
         end
 
         it "raises an error when the pagination library is an empty string" do
@@ -154,13 +154,8 @@ module ActiveManageable
           expect(ActiveManageable.configuration.default_loading_method).to eq(:eager_load)
         end
 
-        it "converts the loading method to a symbol" do
-          ActiveManageable.configuration.default_loading_method = "preload"
-          expect(ActiveManageable.configuration.default_loading_method).to eq(:preload)
-        end
-
-        it "raises an error when the loading method is an invalid string" do
-          expect { ActiveManageable.configuration.default_loading_method = "boom!" }.to raise_error(ArgumentError)
+        it "raises an error when the loading method is a string" do
+          expect { ActiveManageable.configuration.default_loading_method = ActiveManageable::Pagination::Kaminari }.to raise_error(ArgumentError)
         end
 
         it "raises an error when the loading method is an empty string" do
@@ -173,6 +168,10 @@ module ActiveManageable
 
         it "raises an error when the loading method is an invalid symbol" do
           expect { ActiveManageable.configuration.default_loading_method = :pundit }.to raise_error(ArgumentError)
+        end
+
+        it "raises an error when the loading method is a module" do
+          expect { ActiveManageable.configuration.default_loading_method = "includes" }.to raise_error(ArgumentError)
         end
       end
 
