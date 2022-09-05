@@ -115,6 +115,10 @@ module ActiveManageable
 
     private
 
+    def action_scope
+      model_class
+    end
+
     def initialize_state(attributes: {}, options: {})
       @target = nil
       @current_method = calling_method

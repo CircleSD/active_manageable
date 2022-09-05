@@ -9,7 +9,7 @@ module ActiveManageable
         def destroy(id:, options: {})
           initialize_state(options: options)
 
-          @target = model_class
+          @target = action_scope
           includes(@options[:includes])
 
           @target = @target.find(id)

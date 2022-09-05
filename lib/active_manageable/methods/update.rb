@@ -9,7 +9,7 @@ module ActiveManageable
         def update(id:, attributes:, options: {})
           initialize_state(attributes: attributes, options: options)
 
-          @target = model_class
+          @target = action_scope
           includes(@options[:includes])
 
           @target = @target.find(id)

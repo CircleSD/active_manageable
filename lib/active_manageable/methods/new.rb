@@ -9,7 +9,7 @@ module ActiveManageable
         def new(attributes: {})
           initialize_state(attributes: attributes)
 
-          @target = model_class.new(attribute_values)
+          @target = action_scope.new(attribute_values)
           authorize(record: @target)
 
           @target

@@ -29,7 +29,7 @@ module ActiveManageable
         private
 
         def scoped_class
-          model_class
+          action_scope
         end
 
         def search(opts)

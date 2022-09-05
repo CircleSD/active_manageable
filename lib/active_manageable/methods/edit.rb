@@ -10,7 +10,7 @@ module ActiveManageable
         def edit(id:, options: {})
           initialize_state(options: options)
 
-          @target = model_class
+          @target = action_scope
           includes(@options[:includes])
           select(@options[:select])
 
