@@ -737,7 +737,7 @@ After making changes:
 4. run `bundle exec appraisal rspec` to run the tests against different versions of activerecord & activesupport
 5. run `bundle exec rubocop` to check the style of files
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, commit the changes and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
