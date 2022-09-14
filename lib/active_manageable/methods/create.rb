@@ -10,11 +10,21 @@ module ActiveManageable
       def create(attributes:)
         initialize_state(attributes: attributes)
 
-        @target = action_scope.new(attribute_values)
+        @target = build_object_for_create
         authorize(record: @target)
 
         yield if block_given?
 
+        create_object
+      end
+
+      private
+
+      def build_object_for_create
+        action_scope.new(attribute_values)
+      end
+
+      def create_object
         @target.save
       end
     end

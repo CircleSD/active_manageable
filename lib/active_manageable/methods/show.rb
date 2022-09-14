@@ -17,10 +17,16 @@ module ActiveManageable
 
         yield if block_given?
 
-        @target = @target.find(id)
+        @target = find_object_for_show(id: id)
         authorize(record: @target)
 
         @target
+      end
+
+      private
+
+      def find_object_for_show(id:)
+        @target.find(id)
       end
     end
   end

@@ -13,11 +13,21 @@ module ActiveManageable
         @target = action_scope
         includes(@options[:includes])
 
-        @target = @target.find(id)
+        @target = find_object_for_destroy(id: id)
         authorize(record: @target)
 
         yield if block_given?
 
+        destroy_object
+      end
+
+      private
+
+      def find_object_for_destroy(id:)
+        @target.find(id)
+      end
+
+      def destroy_object
         @target.destroy
       end
     end

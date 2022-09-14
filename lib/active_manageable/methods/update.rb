@@ -13,12 +13,28 @@ module ActiveManageable
         @target = action_scope
         includes(@options[:includes])
 
-        @target = @target.find(id)
+        @target = find_object_for_update(id: id)
         authorize(record: @target)
+
+        assign_attributes_for_update
 
         yield if block_given?
 
-        @target.update(@attributes)
+        update_object
+      end
+
+      private
+
+      def find_object_for_update(id:)
+        @target.find(id)
+      end
+
+      def assign_attributes_for_update
+        @target.assign_attributes(@attributes)
+      end
+
+      def update_object
+        @target.save
       end
     end
   end
