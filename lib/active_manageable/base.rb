@@ -4,12 +4,13 @@ module ActiveManageable
     class_attribute :defaults, instance_writer: false, instance_predicate: false
     class_attribute :module_initialize_state_methods, instance_writer: false, instance_predicate: false
 
-    attr_reader :target, :current_method, :attributes, :options
+    attr_accessor :target
+    attr_reader :current_method, :attributes, :options
 
     # target provides a common variable to use within the CRUD, auxiliary & library methods
     # whereas the object & collection methods provide less ambiguous external access
-    alias_method :object, :target
-    alias_method :collection, :target
+    alias_attribute :object, :target
+    alias_attribute :collection, :target
 
     class << self
       # Ruby method called when a child class inherits from a parent class

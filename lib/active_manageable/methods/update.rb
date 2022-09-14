@@ -16,6 +16,8 @@ module ActiveManageable
         @target = @target.find(id)
         authorize(record: @target)
 
+        yield if block_given?
+
         @target.update(@attributes)
       end
     end

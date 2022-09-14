@@ -785,6 +785,21 @@ module ActiveManageable
             end
           end
         end
+
+        context "when a block is given" do
+          it "yields with no arguments" do
+            expect { |b| TestClass.new.create(attributes: {}, &b) }.to yield_with_no_args
+          end
+
+          it "yields to a block that alters the object attribute" do
+            tc = TestClass.new
+            result = tc.create(attributes: {}) do
+              tc.object.name = "Blue Lines"
+            end
+            expect(result).to be(true)
+            expect(tc.object.name).to eq("Blue Lines")
+          end
+        end
       end
     end
   end

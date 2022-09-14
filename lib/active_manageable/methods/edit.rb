@@ -15,6 +15,8 @@ module ActiveManageable
         includes(@options[:includes])
         select(@options[:select])
 
+        yield if block_given?
+
         @target = @target.find(id)
         authorize(record: @target)
 

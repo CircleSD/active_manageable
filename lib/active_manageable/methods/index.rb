@@ -24,6 +24,8 @@ module ActiveManageable
         select(@options[:select])
         distinct(unique_search?)
 
+        yield if block_given?
+
         @target
       end
 

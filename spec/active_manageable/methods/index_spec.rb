@@ -2653,6 +2653,21 @@ module ActiveManageable
             end
           end
         end
+
+        context "when a block is given" do
+          it "yields with no arguments" do
+            expect { |b| TestClass.new.index(&b) }.to yield_with_no_args
+          end
+
+          it "yields to a block that alters the collection attribute" do
+            tc = TestClass.new
+            artist = Artist.find_by(name: "New Order")
+            result = tc.index do
+              tc.collection = tc.collection.where(artist_id: artist.id)
+            end
+            expect(result).to match_array(Album.where(artist_id: artist.id))
+          end
+        end
       end
     end
   end

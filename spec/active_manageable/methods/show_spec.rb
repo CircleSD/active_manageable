@@ -988,6 +988,21 @@ module ActiveManageable
             end
           end
         end
+
+        context "when a block is given" do
+          it "yields with no arguments" do
+            expect { |b| TestClass.new.show(id: album.id, &b) }.to yield_with_no_args
+          end
+
+          it "yields to a block that alters the object attribute" do
+            tc = TestClass.new
+            expect {
+              tc.show(id: album.id) do
+                tc.object = tc.object.where(id: 6666)
+              end
+            }.to raise_error(ActiveRecord::RecordNotFound)
+          end
+        end
       end
     end
   end

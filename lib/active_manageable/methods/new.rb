@@ -13,6 +13,8 @@ module ActiveManageable
         @target = action_scope.new(attribute_values)
         authorize(record: @target)
 
+        yield if block_given?
+
         @target
       end
     end

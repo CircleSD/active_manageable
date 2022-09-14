@@ -801,6 +801,21 @@ module ActiveManageable
             end
           end
         end
+
+        context "when a block is given" do
+          it "yields with no arguments" do
+            expect { |b| TestClass.new.destroy(id: album.id, &b) }.to yield_with_no_args
+          end
+
+          it "yields to a block that alters the object attribute" do
+            tc = TestClass.new
+            result = tc.destroy(id: album.id) do
+              tc.object.name = "Blue Lines"
+            end
+            expect(result).to be_a(Album)
+            expect(tc.object.name).to eq("Blue Lines")
+          end
+        end
       end
     end
   end

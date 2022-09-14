@@ -579,10 +579,18 @@ module ActiveManageable
         stub_const("TestClass", test_class)
       end
 
-      it "adds an object alias for the target variable" do
+      it "adds an object getter alias for the target variable" do
         tc = TestClass.new
         tc.instance_variable_set(:@target, FactoryBot.create(:album))
+        expect(tc.target).to be_a(Album)
         expect(tc.object).to eq(tc.target)
+      end
+
+      it "adds an object setter alias for the target variable" do
+        tc = TestClass.new
+        tc.object = FactoryBot.create(:album)
+        expect(tc.object).to be_a(Album)
+        expect(tc.target).to eq(tc.object)
       end
     end
 
@@ -595,10 +603,18 @@ module ActiveManageable
         stub_const("TestClass", test_class)
       end
 
-      it "adds a collection alias for the target variable" do
+      it "adds a collection getter alias for the target variable" do
         tc = TestClass.new
         tc.instance_variable_set(:@target, FactoryBot.create_list(:album, 2))
+        expect(tc.target).to be_a(Array)
         expect(tc.collection).to eq(tc.target)
+      end
+
+      it "adds an collection setter alias for the target variable" do
+        tc = TestClass.new
+        tc.collection = FactoryBot.create_list(:album, 2)
+        expect(tc.collection).to be_a(Array)
+        expect(tc.target).to eq(tc.collection)
       end
     end
   end
