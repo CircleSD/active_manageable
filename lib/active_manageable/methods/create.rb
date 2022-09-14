@@ -13,9 +13,12 @@ module ActiveManageable
         @target = build_object_for_create
         authorize(record: @target)
 
-        yield if block_given?
-
-        create_object
+        model_class.transaction do
+          yield if block_given?
+          create_object
+        rescue ActiveRecord::RecordInvalid
+          false
+        end
       end
 
       private
@@ -25,7 +28,7 @@ module ActiveManageable
       end
 
       def create_object
-        @target.save
+        @target.save!
       end
     end
   end

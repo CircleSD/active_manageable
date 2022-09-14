@@ -16,9 +16,12 @@ module ActiveManageable
         @target = find_object_for_destroy(id: id)
         authorize(record: @target)
 
-        yield if block_given?
-
-        destroy_object
+        model_class.transaction do
+          yield if block_given?
+          destroy_object
+        rescue ActiveRecord::RecordNotDestroyed
+          false
+        end
       end
 
       private
@@ -28,7 +31,7 @@ module ActiveManageable
       end
 
       def destroy_object
-        @target.destroy
+        @target.destroy!
       end
     end
   end

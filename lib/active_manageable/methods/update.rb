@@ -18,9 +18,12 @@ module ActiveManageable
 
         assign_attributes_for_update
 
-        yield if block_given?
-
-        update_object
+        model_class.transaction do
+          yield if block_given?
+          update_object
+        rescue ActiveRecord::RecordInvalid
+          false
+        end
       end
 
       private
@@ -34,7 +37,7 @@ module ActiveManageable
       end
 
       def update_object
-        @target.save
+        @target.save!
       end
     end
   end
