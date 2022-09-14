@@ -7,21 +7,19 @@ module ActiveManageable
     module CanCanCan
       extend ActiveSupport::Concern
 
-      included do
-        private
+      private
 
-        def authorize(record:, action: nil)
-          action ||= @current_method
-          current_ability.authorize!(action, record)
-        end
+      def authorize(record:, action: nil)
+        action ||= @current_method
+        current_ability.authorize!(action, record)
+      end
 
-        def authorization_scope
-          model_class.accessible_by(current_ability)
-        end
+      def authorization_scope
+        model_class.accessible_by(current_ability)
+      end
 
-        def current_ability
-          ::Ability.new(current_user)
-        end
+      def current_ability
+        ::Ability.new(current_user)
       end
     end
   end

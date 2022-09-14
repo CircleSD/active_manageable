@@ -6,6 +6,11 @@ RSpec.describe AlbumsController, type: :controller do
   let(:album) { create(:album) }
 
   before do
+    ActiveManageable.config do |config|
+      config.authorization_library = :pundit
+      config.search_library = :ransack
+      config.pagination_library = :kaminari
+    end
     ActiveManageable.current_user = create(:user, permission_type: :manage, album_genre: :all)
   end
 

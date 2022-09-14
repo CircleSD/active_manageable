@@ -5,18 +5,18 @@ module ActiveManageable
 
       included do
         include ActiveManageable::Methods::Auxiliary::Includes
+      end
 
-        def destroy(id:, options: {})
-          initialize_state(options: options)
+      def destroy(id:, options: {})
+        initialize_state(options: options)
 
-          @target = action_scope
-          includes(@options[:includes])
+        @target = action_scope
+        includes(@options[:includes])
 
-          @target = @target.find(id)
-          authorize(record: @target)
+        @target = @target.find(id)
+        authorize(record: @target)
 
-          @target.destroy
-        end
+        @target.destroy
       end
     end
   end

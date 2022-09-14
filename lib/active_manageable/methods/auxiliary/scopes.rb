@@ -20,37 +20,35 @@ module ActiveManageable
           end
         end
 
-        included do
-          private
+        private
 
-          def scopes(scopes)
-            get_scopes(scopes).each { |name, args| @target = @target.send(name, *args) }
-            @target
-          end
+        def scopes(scopes)
+          get_scopes(scopes).each { |name, args| @target = @target.send(name, *args) }
+          @target
+        end
 
-          # Accepts a symbol or string scope name, hash containing scope name and argument,
-          # lambda/proc to execute to return scope(s) or an array of those types
-          # and when the argument is blank it uses the class default scopes.
-          # Converts the scopes to a hash of hashes with the key containing the scope name
-          # and value containing an array of scope arguments.
-          def get_scopes(scopes = nil)
-            scopes ||= defaults[:scopes]
+        # Accepts a symbol or string scope name, hash containing scope name and argument,
+        # lambda/proc to execute to return scope(s) or an array of those types
+        # and when the argument is blank it uses the class default scopes.
+        # Converts the scopes to a hash of hashes with the key containing the scope name
+        # and value containing an array of scope arguments.
+        def get_scopes(scopes = nil)
+          scopes ||= defaults[:scopes]
 
-            Array.wrap(scopes).map do |scope|
-              case scope
-              when Symbol, String
-                {scope => []}
-              when Hash
-                # ensure values are an array so they can be passed to the scope using splat operator
-                scope.transform_values! { |v| Array.wrap(v) }
-              when Proc
-                # if the class default contains a lambda/proc that returns nil
-                # don't call get_scopes as we don't want to end up in an infinite loop
-                p_scopes = instance_exec(&scope)
-                get_scopes(p_scopes) if p_scopes.present?
-              end
-            end.compact.reduce({}, :merge)
-          end
+          Array.wrap(scopes).map do |scope|
+            case scope
+            when Symbol, String
+              {scope => []}
+            when Hash
+              # ensure values are an array so they can be passed to the scope using splat operator
+              scope.transform_values! { |v| Array.wrap(v) }
+            when Proc
+              # if the class default contains a lambda/proc that returns nil
+              # don't call get_scopes as we don't want to end up in an infinite loop
+              p_scopes = instance_exec(&scope)
+              get_scopes(p_scopes) if p_scopes.present?
+            end
+          end.compact.reduce({}, :merge)
         end
       end
     end

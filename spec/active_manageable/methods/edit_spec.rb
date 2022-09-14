@@ -946,6 +946,48 @@ module ActiveManageable
             end
           end
         end
+
+        context "when overriding the instance methods and calling super" do
+          before do
+            ActiveManageable.configuration.authorization_library = :pundit
+            test_class = Class.new(ActiveManageable::Base) do
+              manageable ActiveManageable::ALL_METHODS, model_class: Album
+
+              def edit(id:, options: {})
+                super
+              end
+
+              def includes(opts)
+                super
+              end
+
+              def select(attributes)
+                super
+              end
+
+              def authorize(record:, action: nil)
+                super
+              end
+            end
+
+            stub_const("TestClass", test_class)
+          end
+
+          it "returns a record using a combination of the :includes & :select options" do
+            ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :update, album_genre: :all)
+            object = TestClass.new.edit(id: album.id, options: {includes: :songs, select: [:id, :name, :released_at, :genre]})
+            expect(object).to eq(Album.find(album.id))
+            expect(object.songs).to be_loaded
+            expect(object.attributes.keys.sort).to eq([:id, :name, :released_at, :genre].map(&:to_s).sort)
+          end
+
+          context "when the current_user has no permissions" do
+            it "raises Pundit::NotAuthorizedError error" do
+              ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :none, album_genre: :all)
+              expect { TestClass.new.edit(id: album.id) }.to raise_error(Pundit::NotAuthorizedError)
+            end
+          end
+        end
       end
     end
   end

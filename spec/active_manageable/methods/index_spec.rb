@@ -2592,6 +2592,67 @@ module ActiveManageable
             end
           end
         end
+
+        context "when overriding the instance methods and calling super" do
+          before do
+            ActiveManageable.configuration.authorization_library = :pundit
+            ActiveManageable.configuration.search_library = :ransack
+            ActiveManageable.configuration.pagination_library = :kaminari
+            test_class = Class.new(ActiveManageable::Base) do
+              manageable :index, model_class: Album
+
+              def index(options: {})
+                super
+              end
+
+              def authorize(record:, action: nil)
+                super
+              end
+
+              def search(opts)
+                super
+              end
+
+              def order(attributes)
+                super
+              end
+
+              def scopes(scopes)
+                super
+              end
+
+              def page(opts)
+                super
+              end
+
+              def includes(opts)
+                super
+              end
+
+              def select(attributes)
+                super
+              end
+            end
+
+            stub_const("TestClass", test_class)
+          end
+
+          it "returns records using a combination of the pundit authorization_scope, ransack :search option, kaminari :page option and :order, :scopes, :includes & :select options" do
+            artist = Artist.find_by(name: "New Order")
+            ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :read, album_genre: :electronic)
+            collection = TestClass.new.index(options: {search: {artist_id_eq: artist.id}, page: {number: 2, size: 2}, order: "name DESC", scopes: [:released_in_1980s], includes: :songs, select: [:id, :name, :released_at, :genre]})
+            expect(collection).to match_array(Album.where(artist_id: artist.id).electronic.released_in_1980s.order("name DESC").offset(2).limit(2))
+            expect(collection.first.songs).to be_loaded
+            expect(collection.first.attributes.keys.sort).to eq([:id, :name, :released_at, :genre].map(&:to_s).sort)
+          end
+
+          context "when the current_user has no permissions" do
+            it "raises Pundit::NotAuthorizedError error" do
+              ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :none, album_genre: :all)
+              expect { TestClass.new.index }.to raise_error(Pundit::NotAuthorizedError)
+            end
+          end
+        end
       end
     end
   end

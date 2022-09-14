@@ -6,19 +6,19 @@ module ActiveManageable
       included do
         include ActiveManageable::Methods::Auxiliary::Includes
         include ActiveManageable::Methods::Auxiliary::Select
+      end
 
-        def edit(id:, options: {})
-          initialize_state(options: options)
+      def edit(id:, options: {})
+        initialize_state(options: options)
 
-          @target = action_scope
-          includes(@options[:includes])
-          select(@options[:select])
+        @target = action_scope
+        includes(@options[:includes])
+        select(@options[:select])
 
-          @target = @target.find(id)
-          authorize(record: @target)
+        @target = @target.find(id)
+        authorize(record: @target)
 
-          @target
-        end
+        @target
       end
     end
   end

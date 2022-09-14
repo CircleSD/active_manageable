@@ -20,29 +20,27 @@ module ActiveManageable
 
         included do
           class_attribute :unique_search, instance_writer: false, instance_predicate: false
+        end
 
-          private
-
-          def unique_search?
-            case unique_search
-            when nil
-              false
-            when TrueClass, FalseClass
-              unique_search
-            when Hash
-              evaluate_condition(*unique_search.first)
-            end
+        def unique_search?
+          case unique_search
+          when nil
+            false
+          when TrueClass, FalseClass
+            unique_search
+          when Hash
+            evaluate_condition(*unique_search.first)
           end
+        end
 
-          def evaluate_condition(condition, method)
-            result = case method
-            when Symbol
-              method(method).call
-            when Proc
-              instance_exec(&method)
-            end
-            condition == :if ? result : !result
+        def evaluate_condition(condition, method)
+          result = case method
+          when Symbol
+            method(method).call
+          when Proc
+            instance_exec(&method)
           end
+          condition == :if ? result : !result
         end
       end
     end

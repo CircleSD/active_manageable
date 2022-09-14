@@ -5,18 +5,18 @@ module ActiveManageable
 
       included do
         include ActiveManageable::Methods::Auxiliary::Includes
+      end
 
-        def update(id:, attributes:, options: {})
-          initialize_state(attributes: attributes, options: options)
+      def update(id:, attributes:, options: {})
+        initialize_state(attributes: attributes, options: options)
 
-          @target = action_scope
-          includes(@options[:includes])
+        @target = action_scope
+        includes(@options[:includes])
 
-          @target = @target.find(id)
-          authorize(record: @target)
+        @target = @target.find(id)
+        authorize(record: @target)
 
-          @target.update(@attributes)
-        end
+        @target.update(@attributes)
       end
     end
   end

@@ -638,6 +638,39 @@ module ActiveManageable
             end
           end
         end
+
+        context "when overriding the instance methods and calling super" do
+          before do
+            ActiveManageable.configuration.authorization_library = :pundit
+            test_class = Class.new(ActiveManageable::Base) do
+              manageable ActiveManageable::ALL_METHODS, model_class: Album
+
+              def new(attributes: {})
+                super
+              end
+
+              def authorize(record:, action: nil)
+                super
+              end
+            end
+
+            stub_const("TestClass", test_class)
+          end
+
+          it "returns an object using the :attributes" do
+            ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :create, album_genre: :all)
+            attributes = {genre: Album.genres[:electronic], released_at: Date.current}
+            object = TestClass.new.new(attributes: attributes)
+            expect(object.attributes).to eq(Album.new(attributes: attributes).attributes)
+          end
+
+          context "when the current_user has no permissions" do
+            it "raises Pundit::NotAuthorizedError error" do
+              ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :none, album_genre: :all)
+              expect { TestClass.new.new }.to raise_error(Pundit::NotAuthorizedError)
+            end
+          end
+        end
       end
     end
   end

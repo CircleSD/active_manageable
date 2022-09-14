@@ -1005,6 +1005,47 @@ module ActiveManageable
             end
           end
         end
+
+        context "when overriding the instance methods and calling super" do
+          before do
+            ActiveManageable.configuration.authorization_library = :pundit
+            test_class = Class.new(ActiveManageable::Base) do
+              manageable ActiveManageable::ALL_METHODS, model_class: Album
+
+              def update(id:, attributes:, options: {})
+                super
+              end
+
+              def includes(opts)
+                super
+              end
+
+              def authorize(record:, action: nil)
+                super
+              end
+            end
+
+            stub_const("TestClass", test_class)
+          end
+
+          it "updates a record using the :attributes & :includes option and returns true" do
+            ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :update, album_genre: :all)
+            tc = TestClass.new
+            artist = FactoryBot.create(:artist, name: "New Order")
+            attributes = {name: "Power Corruption and Lies", artist_id: artist.id, genre: "pop", released_at: Date.new(1983, 5, 1)}
+            expect(tc.update(id: album.id, attributes: attributes, options: {includes: :songs})).to be(true)
+            expect(tc.object).to have_attributes(attributes)
+            expect(Album.find(album.id)).to have_attributes(attributes)
+            expect(tc.object.songs).to be_loaded
+          end
+
+          context "when the current_user has no permissions" do
+            it "raises Pundit::NotAuthorizedError error" do
+              ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :none, album_genre: :all)
+              expect { TestClass.new.update(id: album.id, attributes: {name: "Power Corruption and Lies"}) }.to raise_error(Pundit::NotAuthorizedError)
+            end
+          end
+        end
       end
     end
   end

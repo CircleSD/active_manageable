@@ -9,40 +9,40 @@ module ActiveManageable
         include ActiveManageable::Methods::Auxiliary::Includes
         include ActiveManageable::Methods::Auxiliary::Select
         include ActiveManageable::Methods::Auxiliary::UniqueSearch
+      end
 
-        def index(options: {})
-          initialize_state(options: options)
+      def index(options: {})
+        initialize_state(options: options)
 
-          @target = authorization_scope
-          authorize(record: model_class)
-          search(@options[:search])
-          order(@options[:order])
-          scopes(@options[:scopes])
-          page(@options[:page])
-          includes(@options[:includes])
-          select(@options[:select])
-          distinct(unique_search?)
+        @target = authorization_scope
+        authorize(record: model_class)
+        search(@options[:search])
+        order(@options[:order])
+        scopes(@options[:scopes])
+        page(@options[:page])
+        includes(@options[:includes])
+        select(@options[:select])
+        distinct(unique_search?)
 
-          @target
-        end
+        @target
+      end
 
-        private
+      private
 
-        def authorization_scope
-          action_scope
-        end
+      def authorization_scope
+        action_scope
+      end
 
-        def search(opts)
-          @target
-        end
+      def search(opts)
+        @target
+      end
 
-        def page(opts)
-          @target
-        end
+      def page(opts)
+        @target
+      end
 
-        def distinct(value)
-          @target = target.distinct(value)
-        end
+      def distinct(value)
+        @target = target.distinct(value)
       end
     end
   end

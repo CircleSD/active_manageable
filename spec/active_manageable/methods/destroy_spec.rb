@@ -758,6 +758,49 @@ module ActiveManageable
             end
           end
         end
+
+        context "when overriding the instance methods and calling super" do
+          before do
+            ActiveManageable.configuration.authorization_library = :pundit
+            test_class = Class.new(ActiveManageable::Base) do
+              manageable ActiveManageable::ALL_METHODS, model_class: Album
+
+              def destroy(id:, options: {})
+                super
+              end
+
+              def includes(opts)
+                super
+              end
+
+              def authorize(record:, action: nil)
+                super
+              end
+            end
+
+            stub_const("TestClass", test_class)
+          end
+
+          it "deletes a record using the :includes option and returns the record" do
+            ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :destroy, album_genre: :all)
+            tc = TestClass.new
+            object = tc.destroy(id: album.id, options: {includes: [:label, :artist]})
+            expect(object).to eq(album)
+            expect(object).to be_destroyed
+            expect(tc.object).to eq(album)
+            expect(tc.object).to be_destroyed
+            expect(Album.where(id: album.id)).not_to exist
+            expect(tc.object.association(:label)).to be_loaded
+            expect(tc.object.association(:artist)).to be_loaded
+          end
+
+          context "when the current_user has no permissions" do
+            it "raises Pundit::NotAuthorizedError error" do
+              ActiveManageable.current_user = FactoryBot.create(:user, permission_type: :none, album_genre: :all)
+              expect { TestClass.new.destroy(id: album.id) }.to raise_error(Pundit::NotAuthorizedError)
+            end
+          end
+        end
       end
     end
   end

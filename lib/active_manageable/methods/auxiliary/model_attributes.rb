@@ -33,25 +33,23 @@ module ActiveManageable
           end
         end
 
-        included do
-          private
+        private
 
-          # Returns attribute values to use in the new and create methods
-          # consisting of a merge of the method attributes argument
-          # and class defaults with the method argument taking precedence
-          def attribute_values
-            @attributes.is_a?(Hash) ? @attributes.reverse_merge(get_default_attribute_values) : @attributes
-          end
+        # Returns attribute values to use in the new and create methods
+        # consisting of a merge of the method attributes argument
+        # and class defaults with the method argument taking precedence
+        def attribute_values
+          @attributes.is_a?(Hash) ? @attributes.reverse_merge(get_default_attribute_values) : @attributes
+        end
 
-          # Get the default attribute values for the method
-          # from the class attribute that can contain a hash of attribute values
-          # or a lambda/proc to execute to return attribute values
-          def get_default_attribute_values
-            default_attributes = defaults[:attributes] || {}
-            attributes = default_attributes[@current_method] || default_attributes[:all] || {}
-            attributes = (instance_exec(&attributes) || {}) if attributes.is_a?(Proc)
-            attributes.with_indifferent_access
-          end
+        # Get the default attribute values for the method
+        # from the class attribute that can contain a hash of attribute values
+        # or a lambda/proc to execute to return attribute values
+        def get_default_attribute_values
+          default_attributes = defaults[:attributes] || {}
+          attributes = default_attributes[@current_method] || default_attributes[:all] || {}
+          attributes = (instance_exec(&attributes) || {}) if attributes.is_a?(Proc)
+          attributes.with_indifferent_access
         end
       end
     end

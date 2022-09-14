@@ -58,39 +58,37 @@ module ActiveManageable
           end
         end
 
-        included do
-          private
+        private
 
-          # Accepts either an array/hash of associations
-          # or a hash with associations and loading_method keys
-          # so it's possible to specify loading_method on a per request basis.
-          # Uses associations and loading_method from opts
-          # or defaults for the method or defaults for all methods
-          # or configuration default loading_method.
-          def includes(opts)
-            unless opts.is_a?(Hash) && opts.key?(:associations)
-              opts = {associations: opts}
-            end
-            associations = opts[:associations] || get_default_includes_associations
-            if associations.present?
-              loading_method = opts[:loading_method] || get_default_includes_loading_method
-              @target = @target.send(loading_method, associations)
-            else
-              @target
-            end
+        # Accepts either an array/hash of associations
+        # or a hash with associations and loading_method keys
+        # so it's possible to specify loading_method on a per request basis.
+        # Uses associations and loading_method from opts
+        # or defaults for the method or defaults for all methods
+        # or configuration default loading_method.
+        def includes(opts)
+          unless opts.is_a?(Hash) && opts.key?(:associations)
+            opts = {associations: opts}
           end
+          associations = opts[:associations] || get_default_includes_associations
+          if associations.present?
+            loading_method = opts[:loading_method] || get_default_includes_loading_method
+            @target = @target.send(loading_method, associations)
+          else
+            @target
+          end
+        end
 
-          def get_default_includes_associations
-            includes = defaults[:includes] || {}
-            associations = includes.dig(@current_method, :associations) || includes.dig(:all, :associations)
-            associations.is_a?(Proc) ? instance_exec(&associations) : associations
-          end
+        def get_default_includes_associations
+          includes = defaults[:includes] || {}
+          associations = includes.dig(@current_method, :associations) || includes.dig(:all, :associations)
+          associations.is_a?(Proc) ? instance_exec(&associations) : associations
+        end
 
-          def get_default_includes_loading_method
-            includes = defaults[:includes] || {}
-            loading_method = includes.dig(@current_method, :loading_method) || includes.dig(:all, :loading_method)
-            loading_method || ActiveManageable.configuration.default_loading_method
-          end
+        def get_default_includes_loading_method
+          includes = defaults[:includes] || {}
+          loading_method = includes.dig(@current_method, :loading_method) || includes.dig(:all, :loading_method)
+          loading_method || ActiveManageable.configuration.default_loading_method
         end
       end
     end

@@ -19,20 +19,18 @@ module ActiveManageable
         end
       end
 
-      included do
-        private
+      private
 
-        def page(opts)
-          @target = @target.page(page_number(opts)).per(page_size(opts))
-        end
+      def page(opts)
+        @target = @target.page(page_number(opts)).per(page_size(opts))
+      end
 
-        def page_number(opts)
-          opts.try(:[], :number)
-        end
+      def page_number(opts)
+        opts.try(:[], :number)
+      end
 
-        def page_size(opts)
-          opts.try(:[], :size) || defaults.dig(:page, :size)
-        end
+      def page_size(opts)
+        opts.try(:[], :size) || defaults.dig(:page, :size)
       end
     end
   end

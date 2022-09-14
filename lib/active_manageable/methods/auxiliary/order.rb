@@ -19,23 +19,21 @@ module ActiveManageable
           end
         end
 
-        included do
-          private
+        private
 
-          def order(attributes)
-            @target = @target.order(get_order_attributes(attributes))
-          end
+        def order(attributes)
+          @target = @target.order(get_order_attributes(attributes))
+        end
 
-          def get_order_attributes(attributes)
-            attributes || get_default_order_attributes
-          end
+        def get_order_attributes(attributes)
+          attributes || get_default_order_attributes
+        end
 
-          # Get the default order attributes from the class attribute
-          # that can contain an array of attribute names or name & direction strings
-          # or a lambda/proc to execute to return an array of attribute names
-          def get_default_order_attributes
-            defaults[:order].is_a?(Proc) ? instance_exec(&defaults[:order]) : defaults[:order]
-          end
+        # Get the default order attributes from the class attribute
+        # that can contain an array of attribute names or name & direction strings
+        # or a lambda/proc to execute to return an array of attribute names
+        def get_default_order_attributes
+          defaults[:order].is_a?(Proc) ? instance_exec(&defaults[:order]) : defaults[:order]
         end
       end
     end
