@@ -11,7 +11,7 @@ module ActiveManageable
         ActiveManageable.configuration = ActiveManageable::Configuration.new
       end
 
-      include_examples ".default_attribute_values", :create
+      include_examples "default_attribute_values", :create
 
       describe "#create" do
         let(:artist) { FactoryBot.create(:artist, name: "Massive Attack") }

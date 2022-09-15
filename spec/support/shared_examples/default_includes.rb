@@ -1,4 +1,4 @@
-RSpec.shared_examples ".default_includes" do |method|
+RSpec.shared_examples "default_includes" do |method|
   describe ".default_includes" do
     before do
       test_class = Class.new(ActiveManageable::Base) do
@@ -182,6 +182,245 @@ RSpec.shared_examples ".default_includes" do |method|
         TestClass.default_includes lambda1, methods: "index", loading_method: :preload
         TestClass.default_includes lambda2, loading_method: :eager_load, methods: "show"
         expect(TestClass.defaults[:includes]).to eq({index: {associations: lambda1, loading_method: :preload}, show: {associations: lambda2, loading_method: :eager_load}})
+      end
+    end
+  end
+
+  describe "#default_includes" do
+    before do
+      test_class = Class.new(ActiveManageable::Base) do
+        manageable method, model_class: Album
+
+        def includes_associations
+          [:artist, {songs: :artist}]
+        end
+      end
+
+      stub_const("TestClass", test_class)
+    end
+
+    context "when the default includes has not been set" do
+      it "returns nil" do
+        tc = TestClass.new
+        expect(tc.default_includes).to be_nil
+      end
+    end
+
+    context "when the default includes is set for all methods" do
+      before do
+        TestClass.default_includes :songs
+      end
+
+      context "without a method argument" do
+        it "returns an array containing the associations" do
+          tc = TestClass.new
+          expect(tc.default_includes).to eq([:songs])
+        end
+      end
+
+      context "with a method argument" do
+        it "returns an array containing the associations" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: :index)).to eq([:songs])
+        end
+      end
+    end
+
+    context "when the default includes is set for selected methods" do
+      before do
+        TestClass.default_includes :songs, :artist, methods: :index
+      end
+
+      context "without a method argument" do
+        it "returns nil" do
+          tc = TestClass.new
+          expect(tc.default_includes).to be_nil
+        end
+      end
+
+      context "with an argument for a method with default includes" do
+        it "returns an array containing the associations" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: :index)).to eq([:songs, :artist])
+        end
+      end
+
+      context "with an argument for a method without default includes" do
+        it "returns nil" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: :show)).to be_nil
+        end
+      end
+
+      context "with a string argument for a method with default includes" do
+        it "returns an array containing the associations" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: "index")).to eq([:songs, :artist])
+        end
+      end
+
+      context "with a string argument for a method without default includes" do
+        it "returns nil" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: "show")).to be_nil
+        end
+      end
+    end
+
+    context "when the default includes is set with a proc and :loading_method & :methods options" do
+      before do
+        prc = proc { includes_associations }
+        TestClass.default_includes prc, loading_method: :eager_load, methods: [:index, :show]
+      end
+
+      context "without a method argument" do
+        it "returns nil" do
+          tc = TestClass.new
+          expect(tc.default_includes).to be_nil
+        end
+      end
+
+      context "with an argument for a method with default includes" do
+        it "returns an array containing the associations" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: :index)).to eq([:artist, {songs: :artist}])
+        end
+      end
+
+      context "with an argument for a method without default includes" do
+        it "returns nil" do
+          tc = TestClass.new
+          expect(tc.default_includes(method: :edit)).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "#default_loading_method" do
+    before do
+      test_class = Class.new(ActiveManageable::Base) do
+        manageable method, model_class: Album
+
+        def includes_associations
+          [:artist, {songs: :artist}]
+        end
+      end
+
+      stub_const("TestClass", test_class)
+    end
+
+    context "when the default includes has not been set" do
+      it "returns the configuration :default_loading_method" do
+        tc = TestClass.new
+        expect(tc.default_loading_method).to eq(:includes)
+      end
+    end
+
+    context "when the default includes is set for all methods without the :loading_method" do
+      before do
+        TestClass.default_includes :songs
+      end
+
+      context "without a method argument" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method).to eq(:includes)
+        end
+      end
+
+      context "with a method argument" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :index)).to eq(:includes)
+        end
+      end
+    end
+
+    context "when the default includes is set for all methods with the :loading_method" do
+      before do
+        TestClass.default_includes :songs, loading_method: :preload
+      end
+
+      context "without a method argument" do
+        it "returns the option :loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method).to eq(:preload)
+        end
+      end
+
+      context "with a method argument" do
+        it "returns the option :loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :index)).to eq(:preload)
+        end
+      end
+    end
+
+    context "when the default includes is set for selected methods without the :loading_method" do
+      before do
+        TestClass.default_includes :songs, :artist, methods: :index
+      end
+
+      context "without a method argument" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method).to eq(:includes)
+        end
+      end
+
+      context "with an argument for a method with default includes" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :index)).to eq(:includes)
+        end
+      end
+
+      context "with an argument for a method without default includes" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :show)).to eq(:includes)
+        end
+      end
+    end
+
+    context "when the default includes is set for selected methods with the :loading_method" do
+      before do
+        TestClass.default_includes :songs, :artist, methods: :index, loading_method: :preload
+      end
+
+      context "without a method argument" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method).to eq(:includes)
+        end
+      end
+
+      context "with an argument for a method with default includes" do
+        it "returns the option :loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :index)).to eq(:preload)
+        end
+      end
+
+      context "with an argument for a method without default includes" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: :show)).to eq(:includes)
+        end
+      end
+
+      context "with a string argument for a method with default includes" do
+        it "returns the option :loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: "index")).to eq(:preload)
+        end
+      end
+
+      context "with a string argument for a method without default includes" do
+        it "returns the configuration :default_loading_method" do
+          tc = TestClass.new
+          expect(tc.default_loading_method(method: "show")).to eq(:includes)
+        end
       end
     end
   end

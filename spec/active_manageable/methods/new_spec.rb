@@ -11,7 +11,7 @@ module ActiveManageable
         ActiveManageable.configuration = ActiveManageable::Configuration.new
       end
 
-      include_examples ".default_attribute_values", :new
+      include_examples "default_attribute_values", :new
 
       describe "#new" do
         before do

@@ -26,7 +26,7 @@ module ActiveManageable
       # or no ransack sorts params provided
       def order(attributes)
         if @ransack.blank? || @ransack.sorts.empty?
-          @target = @target.order(get_order_attributes(attributes))
+          @target = @target.order(order_attributes(attributes))
         else
           @target
         end

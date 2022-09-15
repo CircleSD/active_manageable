@@ -24,19 +24,19 @@ module ActiveManageable
           end
         end
 
+        # Returns the default select attributes for the method
+        # from the class attribute that can contain an array of attribute names
+        # or a lambdas/procs to execute to return an array of attribute names
+        def default_select(method: @current_method)
+          default_selects = defaults[:select] || {}
+          attributes = default_selects[method.try(:to_sym)] || default_selects[:all] || []
+          attributes.is_a?(Proc) ? instance_exec(&attributes) : attributes
+        end
+
         private
 
         def select(attributes)
-          @target = @target.select(attributes || get_default_select_attributes)
-        end
-
-        # Get the default select attributes for the method
-        # from the class attribute that can contain an array of attribute names
-        # or a lambdas/procs to execute to return an array of attribute names
-        def get_default_select_attributes
-          default_selects = defaults[:select] || {}
-          attributes = default_selects[@current_method] || default_selects[:all] || []
-          attributes.is_a?(Proc) ? instance_exec(&attributes) : attributes
+          @target = @target.select(attributes || default_select)
         end
       end
     end

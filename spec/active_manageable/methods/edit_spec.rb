@@ -11,8 +11,8 @@ module ActiveManageable
         ActiveManageable.configuration = ActiveManageable::Configuration.new
       end
 
-      include_examples ".default_includes", :edit
-      include_examples ".default_select", :edit
+      include_examples "default_includes", :edit
+      include_examples "default_select", :edit
 
       describe "#edit" do
         let(:artist) { FactoryBot.create(:artist, name: "New Order") }

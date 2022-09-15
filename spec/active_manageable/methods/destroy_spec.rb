@@ -10,7 +10,7 @@ module ActiveManageable
         ActiveManageable.configuration = ActiveManageable::Configuration.new
       end
 
-      include_examples ".default_includes", :destroy
+      include_examples "default_includes", :destroy
 
       describe "#destroy" do
         let(:label) { FactoryBot.create(:label, name: "Factory Records") }

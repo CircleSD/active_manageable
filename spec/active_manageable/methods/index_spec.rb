@@ -11,8 +11,8 @@ module ActiveManageable
         ActiveManageable.configuration = ActiveManageable::Configuration.new
       end
 
-      include_examples ".default_includes", :index
-      include_examples ".default_select", :index
+      include_examples "default_includes", :index
+      include_examples "default_select", :index
 
       describe ".unique_search" do
         before do
@@ -93,7 +93,7 @@ module ActiveManageable
 
           it "returns the default value of false" do
             tc = TestClass.new
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
         end
 
@@ -109,7 +109,7 @@ module ActiveManageable
 
           it "returns true" do
             tc = TestClass.new
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -127,13 +127,13 @@ module ActiveManageable
           it "returns false when the method returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the method returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -151,13 +151,13 @@ module ActiveManageable
           it "returns false when the method returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the method returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -175,13 +175,13 @@ module ActiveManageable
           it "returns false when the lambda returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the lambda returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -199,13 +199,13 @@ module ActiveManageable
           it "returns false when the lambda returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the lambda returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -223,13 +223,13 @@ module ActiveManageable
           it "returns false when the proc returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the proc returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
 
@@ -247,13 +247,13 @@ module ActiveManageable
           it "returns false when the proc returns true" do
             tc = TestClass.new
             tc.test = true
-            expect(tc.send(:unique_search?)).to be(false)
+            expect(tc.unique_search?).to be(false)
           end
 
           it "returns true when the proc returns false" do
             tc = TestClass.new
             tc.test = false
-            expect(tc.send(:unique_search?)).to be(true)
+            expect(tc.unique_search?).to be(true)
           end
         end
       end
@@ -298,6 +298,52 @@ module ActiveManageable
         end
       end
 
+      describe "#default_order" do
+        before do
+          test_class = Class.new(ActiveManageable::Base) do
+            manageable :index
+
+            def order_by
+              [:id, :name, "created_at DESC"]
+            end
+          end
+
+          stub_const("TestClass", test_class)
+        end
+
+        context "when the default order has not been set" do
+          it "returns nil" do
+            tc = TestClass.new
+            expect(tc.default_order).to be_nil
+          end
+        end
+
+        context "when the default order is set to a symbol attribute" do
+          it "returns an array containing the symbol attribute" do
+            TestClass.default_order :name
+            tc = TestClass.new
+            expect(tc.default_order).to eq([:name])
+          end
+        end
+
+        context "when the default order is set to a string attribute" do
+          it "returns an array containing the string attribute" do
+            TestClass.default_order "name DESC"
+            tc = TestClass.new
+            expect(tc.default_order).to eq(["name DESC"])
+          end
+        end
+
+        context "when the default order is set to a proc" do
+          it "returns the output of the block" do
+            prc = proc { order_by }
+            TestClass.default_order prc
+            tc = TestClass.new
+            expect(tc.default_order).to eq([:id, :name, "created_at DESC"])
+          end
+        end
+      end
+
       describe ".default_scopes" do
         before do
           test_class = Class.new(ActiveManageable::Base) do
@@ -331,9 +377,55 @@ module ActiveManageable
 
         context "when called with a proc" do
           it "sets the defaults attribute :scopes value" do
-            proc = proc { index_scopes }
-            TestClass.default_scopes proc
-            expect(TestClass.defaults[:scopes]).to eq(proc)
+            prc = proc { index_scopes }
+            TestClass.default_scopes prc
+            expect(TestClass.defaults[:scopes]).to eq(prc)
+          end
+        end
+      end
+
+      describe "#default_scopes" do
+        before do
+          test_class = Class.new(ActiveManageable::Base) do
+            manageable :index
+
+            def index_scopes
+              [:rock, {released_in_year: 1969}]
+            end
+          end
+
+          stub_const("TestClass", test_class)
+        end
+
+        context "when the default scopes has not been set" do
+          it "returns an empty hash" do
+            tc = TestClass.new
+            expect(tc.default_scopes).to eq({})
+          end
+        end
+
+        context "when the default scopes is set to a scope name" do
+          it "returns a hash with a key of the scope name and value of an empty array" do
+            TestClass.default_scopes :electronic
+            tc = TestClass.new
+            expect(tc.default_scopes).to eq({electronic: []})
+          end
+        end
+
+        context "when the default scopes is set to scope name and argument" do
+          it "returns a hash with a key of the scope name and value of an array containing the scope argument" do
+            TestClass.default_scopes released_in_year: "1980"
+            tc = TestClass.new
+            expect(tc.default_scopes).to eq({released_in_year: ["1980"]})
+          end
+        end
+
+        context "when the default scopes is set to a proc" do
+          it "returns the output of the block converted to a hash with scope name keys and array of arguments values" do
+            prc = proc { index_scopes }
+            TestClass.default_scopes prc
+            tc = TestClass.new
+            expect(tc.default_scopes).to eq({rock: [], released_in_year: [1969]})
           end
         end
       end
@@ -466,9 +558,9 @@ module ActiveManageable
             before do
               test_class = Class.new(ActiveManageable::Base) do
                 manageable :index, model_class: Album
-                default_order -> { order_attributes }
+                default_order -> { default_order_attributes }
 
-                def order_attributes
+                def default_order_attributes
                   "name DESC"
                 end
               end
@@ -495,9 +587,9 @@ module ActiveManageable
             before do
               test_class = Class.new(ActiveManageable::Base) do
                 manageable :index, model_class: Album
-                default_order proc { order_attributes }
+                default_order proc { default_order_attributes }
 
-                def order_attributes
+                def default_order_attributes
                   [:released_at, :name]
                 end
               end
@@ -524,9 +616,9 @@ module ActiveManageable
             before do
               test_class = Class.new(ActiveManageable::Base) do
                 manageable :index, model_class: Album
-                default_order -> { order_attributes }
+                default_order -> { default_order_attributes }
 
-                def order_attributes
+                def default_order_attributes
                   nil
                 end
               end
@@ -552,9 +644,9 @@ module ActiveManageable
             before do
               test_class = Class.new(ActiveManageable::Base) do
                 manageable :index, model_class: Album
-                default_order -> { order_attributes }
+                default_order -> { default_order_attributes }
 
-                def order_attributes
+                def default_order_attributes
                   []
                 end
               end

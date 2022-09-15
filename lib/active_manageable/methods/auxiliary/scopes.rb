@@ -20,6 +20,15 @@ module ActiveManageable
           end
         end
 
+        # Returns the default scopes in a hash of hashes with the key containing the scope name
+        # and value containing an array of scope arguments.
+        #
+        # For example:-
+        # {rock: [], electronic: [], released_in_year: ["1980"]}
+        def default_scopes
+          get_scopes
+        end
+
         private
 
         def scopes(scopes)

@@ -1,4 +1,4 @@
-RSpec.shared_examples ".default_attribute_values" do |method|
+RSpec.shared_examples "default_attribute_values" do |method|
   describe ".default_attribute_values" do
     before do
       test_class = Class.new(ActiveManageable::Base) do
@@ -73,6 +73,116 @@ RSpec.shared_examples ".default_attribute_values" do |method|
         lambda = -> { attr_values }
         TestClass.default_attribute_values lambda, methods: ["new", "create"]
         expect(TestClass.defaults[:attributes]).to eq({new: lambda, create: lambda})
+      end
+    end
+  end
+
+  describe "#default_attribute_values" do
+    before do
+      test_class = Class.new(ActiveManageable::Base) do
+        manageable method, model_class: Album
+
+        def attr_values
+          {genre: Album.genres[:electronic], released_at: Date.current}
+        end
+      end
+
+      stub_const("TestClass", test_class)
+    end
+
+    context "when the default attribute values has not been set" do
+      it "returns an empty hash" do
+        tc = TestClass.new
+        expect(tc.default_attribute_values).to eq({})
+      end
+    end
+
+    context "when the default attribute values is set for all methods" do
+      before do
+        TestClass.default_attribute_values genre: Album.genres[:rock]
+      end
+
+      context "without a method argument" do
+        it "returns a hash containing the attribute values" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values).to eq({genre: Album.genres[:rock]}.with_indifferent_access)
+        end
+      end
+
+      context "with a method argument" do
+        it "returns a hash containing the attribute values" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: :new)).to eq({genre: Album.genres[:rock]}.with_indifferent_access)
+        end
+      end
+    end
+
+    context "when the default attribute values is set for selected methods" do
+      before do
+        TestClass.default_attribute_values genre: Album.genres[:rock], methods: :new
+      end
+
+      context "without a method argument" do
+        it "returns an empty hash" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values).to eq({})
+        end
+      end
+
+      context "with an argument for a method with default select" do
+        it "returns a hash containing the attribute values" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: :new)).to eq({genre: Album.genres[:rock]}.with_indifferent_access)
+        end
+      end
+
+      context "with an argument for a method without default select" do
+        it "returns an empty hash" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: :create)).to eq({})
+        end
+      end
+
+      context "with a string argument for a method with default select" do
+        it "returns a hash containing the attribute values" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: "new")).to eq({genre: Album.genres[:rock]}.with_indifferent_access)
+        end
+      end
+
+      context "with a string argument for a method without default select" do
+        it "returns an empty hash" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: "create")).to eq({})
+        end
+      end
+    end
+
+    context "when the default attribute values is set with a proc and :methods option" do
+      before do
+        prc = proc { attr_values }
+        TestClass.default_attribute_values prc, methods: :new
+      end
+
+      context "without a method argument" do
+        it "returns an empty hash" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values).to eq({})
+        end
+      end
+
+      context "with an argument for a method with default select" do
+        it "returns a hash containing the attribute values" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: :new)).to eq({genre: Album.genres[:electronic], released_at: Date.current}.with_indifferent_access)
+        end
+      end
+
+      context "with an argument for a method without default select" do
+        it "returns an empty hash" do
+          tc = TestClass.new
+          expect(tc.default_attribute_values(method: :create)).to eq({})
+        end
       end
     end
   end

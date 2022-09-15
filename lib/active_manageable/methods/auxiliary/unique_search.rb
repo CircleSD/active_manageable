@@ -33,6 +33,8 @@ module ActiveManageable
           end
         end
 
+        private
+
         def evaluate_condition(condition, method)
           result = case method
           when Symbol
