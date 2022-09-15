@@ -33,6 +33,10 @@ module ActiveManageable
         expect(ActiveManageable.configuration.subclass_suffix).to eq("Manager")
       end
 
+      it "defaults the paginate without count option to false" do
+        expect(ActiveManageable.configuration.paginate_without_count).to be(false)
+      end
+
       describe "#authorization_library" do
         it "returns the default authorization library" do
           expect(ActiveManageable.configuration.authorization_library).to be_nil
@@ -183,6 +187,17 @@ module ActiveManageable
         it "sets the subclass suffix" do
           ActiveManageable.configuration.subclass_suffix = "Concern"
           expect(ActiveManageable.configuration.subclass_suffix).to eq("Concern")
+        end
+      end
+
+      describe "#paginate_without_count" do
+        it "returns the default paginate without count" do
+          expect(ActiveManageable.configuration.paginate_without_count).to be(false)
+        end
+
+        it "sets the paginate without count" do
+          ActiveManageable.configuration.paginate_without_count = true
+          expect(ActiveManageable.configuration.paginate_without_count).to be(true)
         end
       end
     end

@@ -2611,11 +2611,28 @@ module ActiveManageable
             end
           end
 
+          describe ".paginate_without_count" do
+            context "when called without an argument" do
+              it "sets the without_count attribute to true" do
+                TestClass.paginate_without_count
+                expect(TestClass.without_count).to be(true)
+              end
+            end
+
+            context "when called with an argument" do
+              it "sets the without_count attribute" do
+                TestClass.paginate_without_count false
+                expect(TestClass.without_count).to be(false)
+              end
+            end
+          end
+
           describe "#page" do
             context "without :page option" do
-              context "without a class default page size"
-              it "returns first page and number of records using the kaminari :default_per_page" do
-                expect(TestClass.new.index).to match_array(Album.limit(Kaminari.config.default_per_page))
+              context "without a class default page size" do
+                it "returns first page and number of records using the kaminari :default_per_page" do
+                  expect(TestClass.new.index).to match_array(Album.limit(Kaminari.config.default_per_page))
+                end
               end
 
               context "with a class :default_page_size" do
@@ -2640,6 +2657,216 @@ module ActiveManageable
               it "returns records using the :page option :number and :size values" do
                 collection = TestClass.new.index(options: {page: {number: 2, size: 5}})
                 expect(collection).to match_array(Album.offset(5).limit(5))
+              end
+            end
+
+            describe "#paginate_without_count?" do
+              context "when configuration :paginate_without_count is false" do
+                before do
+                  ActiveManageable.configuration.paginate_without_count = false
+                end
+
+                context "when class :without_count is nil" do
+                  context "without :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
+
+                context "when class :without_count is false" do
+                  before do
+                    TestClass.paginate_without_count false
+                  end
+
+                  context "without :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
+
+                context "when class :without_count is true" do
+                  before do
+                    TestClass.paginate_without_count
+                  end
+
+                  context "without :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
+              end
+
+              context "when configuration :paginate_without_count is true" do
+                before do
+                  ActiveManageable.configuration.paginate_without_count = true
+                end
+
+                context "when class :without_count is nil" do
+                  context "without :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
+
+                context "when class :without_count is false" do
+                  before do
+                    TestClass.paginate_without_count false
+                  end
+
+                  context "without :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
+
+                context "when class :without_count is true" do
+                  before do
+                    TestClass.paginate_without_count
+                  end
+
+                  context "without :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of false" do
+                    it "returns a collection with total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: false}})
+                      expect(collection.total_count).to eq(Album.count)
+                    end
+                  end
+
+                  context "with :page option and :without_count value of true" do
+                    it "returns a collection without total_count" do
+                      collection = TestClass.new.index(options: {page: {number: 1, size: 5, without_count: true}})
+                      expect { collection.total_count }.to raise_error(RuntimeError)
+                    end
+                  end
+                end
               end
             end
           end

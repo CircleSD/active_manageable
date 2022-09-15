@@ -6,11 +6,12 @@ module ActiveManageable
 
   class Configuration
     attr_reader :authorization_library, :search_library, :pagination_library, :default_loading_method
-    attr_accessor :subclass_suffix
+    attr_accessor :subclass_suffix, :paginate_without_count
 
     def initialize
       @default_loading_method = :includes
       @subclass_suffix = "Manager"
+      @paginate_without_count = false
     end
 
     def authorization_library=(authorization_library)
