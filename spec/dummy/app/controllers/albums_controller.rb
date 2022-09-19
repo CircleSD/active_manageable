@@ -21,7 +21,7 @@ class AlbumsController < ApplicationController
     @album = manager.object
 
     if result
-      redirect_to @album, notice: "Album was successfully created."
+      redirect_to @album, notice: I18n.t(:msg_album_created)
     else
       render :new
     end
@@ -38,7 +38,7 @@ class AlbumsController < ApplicationController
     @album = manager.object
 
     if result
-      redirect_to @album, notice: "Album was successfully updated."
+      redirect_to @album, notice: I18n.t(:msg_album_updated)
     else
       render :edit
     end
@@ -50,7 +50,7 @@ class AlbumsController < ApplicationController
     @album = manager.object
 
     if result
-      redirect_to albums_url, notice: "Album was successfully destroyed."
+      redirect_to albums_url, notice: I18n.t(:msg_album_destroyed)
     else
       render :show
     end

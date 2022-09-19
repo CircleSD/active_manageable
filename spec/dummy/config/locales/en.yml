@@ -31,3 +31,8 @@
 
 en:
   hello: "Hello world"
+
+  msg_album_created: Album was successfully created
+  msg_album_updated: Album was successfully updated
+  msg_album_destroyed: Album was successfully destroyed
+
