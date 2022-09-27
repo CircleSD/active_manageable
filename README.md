@@ -49,7 +49,7 @@ def index
 end
 ```
 
-The manager classes provide standard implementations of the seven core CRUD methods. These can be overwritten to perform custom business logic and the classes can also be extended to include the business logic for additional actions, both making use of the internal ActiveManageable methods and variables described in the [Adding Bespoke Methods](#adding-bespoke-methods) section.
+The manager classes provide standard implementations of the seven core CRUD methods. These can be extended or overwritten to perform custom business logic and the classes can also be extended to include the business logic for additional actions, both making use of the internal ActiveManageable methods and variables described in the [Adding Bespoke Methods](#adding-bespoke-methods) section.
 
 With an Activity model in a CRM application to manage meetings & tasks, a complete action may be required. This could be implemented as follows:
 
@@ -110,6 +110,7 @@ gem install active_manageable
   - [Default Scopes](#default-scopes)
   - [Unique Search](#unique-search)
   - [Default Page Size](#default-page-size)
+  - [Paginate Without Count](#paginate-without-count)
   - [Current Method](#current-method)
 - [Index Method](#index-method)
   - [Authorization Scope](#index-authorization-scope)
@@ -131,6 +132,8 @@ gem install active_manageable
   - [Includes Option](#update-includes-option)
 - [Destroy Method](#destroy-method)
   - [Includes Option](#destroy-includes-option)
+- [Extending the CRUD Methods](#extending-the-crud-methods)
+- [Build and Retrieve Scoped Records](#build-and-retrieve-scoped-records)
 - [Attribute Value Parsing](#attribute-value-parsing)
   - [Date and DateTime Attribute Values](#date-and-datetime-attribute-values)
   - [Numeric Attribute Values](#numeric-attribute-values)
@@ -143,7 +146,7 @@ gem install active_manageable
 
 ## Configuration
 
-Create an initializer to configure the optional authorization, search and pagination libraries to use.
+Create an initializer to configure the optional in-built authorization, search and pagination libraries to use.
 
 ```ruby
 ActiveManageable.config do |config|
@@ -152,6 +155,8 @@ ActiveManageable.config do |config|
   config.pagination_library = :kaminari
 end
 ```
+
+These library configuration options can also be set to a module in order to use a custom authorization, search or pagination implementation.
 
 When eager loading associations the `includes` method is used by default but this can be changed via a configuration option that accepts `:includes`, `:preload` or `:eager_load`
 
@@ -388,6 +393,31 @@ class AlbumManager < ActiveManageable::Base
 end
 ```
 
+### Paginate Without Count
+
+When using the [Kaminari](https://github.com/kaminari/kaminari) pagination library, the `paginate_without_count` method will result in the index method using the Kaminari `without_count` mode to create a paginatable collection without counting the total number of records.
+
+```ruby
+class AlbumManager < ActiveManageable::Base
+  manageable :index
+  paginate_without_count
+end
+```
+
+It is also possible to control whether to use the `without_count` mode globally by setting the `paginate_without_count` configuration option.
+
+```ruby
+ActiveManageable.config do |config|
+  config.paginate_without_count = true
+end
+```
+
+And it is also possible to control whether to use the `without_count` mode for an individual index method call by including the `:without_count` key within the `options` argument `:page` hash.
+
+```ruby
+manager.index(options: {page: {number: 2, size: 10, without_count: true}})
+```
+
 ### Current Method
 
 ActiveManageable includes a `current_method` attribute which returns the name of the method being executed as a symbol, which can potentially be used within methods in conjunction with a lambda for the default methods described above. Additionally, the method argument `options` and `attributes` are also accessible as attributes.
@@ -411,7 +441,7 @@ end
 
 ## Index Method
 
-The `index` method has an optional `options` keyword argument. The `options` hash can contain `:search`, `:order`, `:scopes`, `:page`, `:includes` and `:select` keys. The method performs authorization for the current user, method and model class using the configuration library; retrieves record using the various options described below; and returns the records which are also accessible via the `collection` attribute.
+The `index` method has an optional `options` keyword argument. The `options` hash can contain `:search`, `:order`, `:scopes`, `:page`, `:includes` and `:select` keys. The method performs authorization for the current user, method and model class using the configuration library; invokes a block (if provided); retrieves records using the various options described below; and returns the records which are also accessible via the `collection` attribute.
 
 ```ruby
 manager.index
@@ -490,7 +520,7 @@ If the class `has_unique_search` method has been used then this will be evaluate
 
 ## Show Method
 
-The `show` method has `id` and optional `options` keyword arguments. The `options` hash can contain `:includes` and `:select` keys. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; and returns the record which is also accessible via the `object` attribute.
+The `show` method has `id` and optional `options` keyword arguments. The `options` hash can contain `:includes` and `:select` keys. The method invokes a block (if provided); retrieves a record; performs authorization for the current user, method and record using the configuration library; and returns the record which is also accessible via the `object` attribute.
 
 ```ruby
 manager.show(id: 1)
@@ -520,7 +550,7 @@ manager.show(id: 1, options: {select: [:id, :name, :artist_id, :released_at]})
 
 ## New Method
 
-The `new` method has an optional `attributes` keyword argument. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when building the record. The method builds a record; performs authorization for the current user, method and record using the configuration library; and returns the record which is also accessible via the `object` attribute.
+The `new` method has an optional `attributes` keyword argument. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when building the record. The method builds a record; performs authorization for the current user, method and record using the configuration library; invokes a block (if provided); and returns the record which is also accessible via the `object` attribute.
 
 ```ruby
 manager.new
@@ -534,7 +564,7 @@ manager.new(attributes: {genre: "electronic", published_at: Date.current})
 
 ## Create Method
 
-The `create` method has an `attributes` keyword argument. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when building the record. The method builds a record; performs authorization for the current user, method and record using the configuration library; attempts to save the record and returns the save result. The record is also accessible via the `object` attribute.
+The `create` method has an `attributes` keyword argument. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when building the record. The method builds a record; performs authorization for the current user, method and record using the configuration library; invokes a block (if provided) and attempts to save the record within a transaction; and returns the save result. The record is also accessible via the `object` attribute.
 
 ```ruby
 manager.create(attributes: {name: "Substance", genre: "electronic", published_at: Date.current})
@@ -544,7 +574,7 @@ The `attributes` argument values are combined with the class default values and 
 
 ## Edit Method
 
-The `edit` method has `id` and optional `options` keyword arguments. The `options` hash can contain `:includes` and `:select` keys. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; and returns the record which is also accessible via the `object` attribute.
+The `edit` method has `id` and optional `options` keyword arguments. The `options` hash can contain `:includes` and `:select` keys. The method invokes a block (if provided); retrieves a record; performs authorization for the current user, method and record using the configuration library; and returns the record which is also accessible via the `object` attribute.
 
 ```ruby
 manager.edit(id: 1)
@@ -566,7 +596,7 @@ manager.edit(id: 1, options: {includes: {associations: :songs, loading_method: :
 
 ## Update Method
 
-The `update` method has `id`, `attributes` and optional `options` keyword arguments. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when updating the record. The `options` hash can contain an `:includes` key. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; updates the attributes; attempts to save the record and returns the save result. The record is also accessible via the `object` attribute.
+The `update` method has `id`, `attributes` and optional `options` keyword arguments. The `attributes` argument is for an `ActionController::Parameters` or hash of attribute names and values to use when updating the record. The `options` hash can contain an `:includes` key. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; assigns the attributes; invokes a block (if provided) and attempts to save the record within a transaction; and returns the save result. The record is also accessible via the `object` attribute.
 
 ```ruby
 manager.update(id: 1, attributes: {genre: "electronic", published_at: Date.current})
@@ -588,7 +618,7 @@ manager.update(id: 1, attributes: {published_at: Date.current}, options: {includ
 
 ## Destroy Method
 
-The `destroy` method has `id` and optional `options` keyword arguments. The `options` hash can contain an `:includes` key. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; attempts to destroy the record and returns the destroy result. The record is accessible via the `object` attribute.
+The `destroy` method has `id` and optional `options` keyword arguments. The `options` hash can contain an `:includes` key. The method retrieves a record; performs authorization for the current user, method and record using the configuration library; invokes a block (if provided) and attempts to destroy the record within a transaction; and returns the destroy result. The record is accessible via the `object` attribute.
 
 ```ruby
 manager.destroy(id: 1)
@@ -606,6 +636,37 @@ The `:includes` key can also be used to vary the method used to eager load assoc
 
 ```ruby
 manager.destroy(id: 1, options: {includes: {associations: :songs, loading_method: :preload}})
+```
+
+## Extending the CRUD Methods
+
+Each of the seven core CRUD methods include a `yield` so it is possible to extend the methods by passing a block.
+
+```ruby
+def create(attributes:)
+  super do
+    @target.description = "change the object before it is created using a block"
+  end
+end
+```
+
+The logic within each of the methods has also been split into subsidiary methods so it is possible to extend or override these methods.
+
+```ruby
+def create_object
+  @target.description = "change the object before it is created via an override"
+  super
+end
+```
+
+## Build and Retrieve Scoped Records
+
+Each of the seven core CRUD methods build and retrieve records using the `action_scope` method which by default returns the model class. In order to build or retrieve records using a scope it is possible to override this method.
+
+```ruby
+def action_scope
+  current_user.albums
+end
 ```
 
 ## Attribute Value Parsing
@@ -693,7 +754,7 @@ ActiveManageable includes the following attributes:
 
 ## Adding Bespoke Methods
 
-The manager classes provide standard implementations of the seven core CRUD methods. These can be overwritten to perform custom business logic and the classes can also be extended to include the business logic for additional actions, both making use of the internal ActiveManageable methods and variables.
+The manager classes provide standard implementations of the seven core CRUD methods. These can be extended or overwritten to perform custom business logic and the classes can also be extended to include the business logic for additional actions, both making use of the internal ActiveManageable methods and variables.
 
 ```ruby
 def complete(id:)
@@ -737,7 +798,16 @@ After making changes:
 4. run `bundle exec appraisal rspec` to run the tests against different versions of activerecord & activesupport
 5. run `bundle exec rubocop` to check the style of files
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, commit the changes and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
+
+To release a new version:
+
+1. update the version number in `version.rb`
+2. update the change log in `CHANGELOG.md`
+3. run `bundle` to update the `Gemfile.lock` version
+4. commit the changes
+5. run `bundle exec rake release` to create & push a git tag for the version and push the `.gem` file to [rubygems.org](https://rubygems.org).
+6. create a new release for the version on GitHub
 
 ## Contributing
 
