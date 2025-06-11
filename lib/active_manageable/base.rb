@@ -137,8 +137,8 @@ module ActiveManageable
     # when the ransack module is included as it has its own definition of the method that calls super
     # https://www.lucascaton.com.br/2016/11/04/ruby-how-to-get-the-name-of-the-calling-method
     def calling_method
-      my_caller = caller_locations(1..1).first.label
-      caller_locations[1..].find { |location| location.label != my_caller }.label.to_sym
+      my_caller = caller_locations(1..1).first.base_label
+      caller_locations[1..].find { |location| location.base_label != my_caller }.base_label.to_sym
     end
 
     # Converts a state argument to a ActiveSupport::HashWithIndifferentAccess.
