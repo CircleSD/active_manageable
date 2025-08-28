@@ -1,8 +1,5 @@
 require_relative "boot"
 
-# require logger for Rails 7.0
-require "logger"
-
 require "rails"
 # Pick the frameworks you want:
 require "active_model/railtie"
