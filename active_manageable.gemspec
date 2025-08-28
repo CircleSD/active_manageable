@@ -14,8 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/CircleSD/active_manageable"
   spec.license = "MIT"
 
-  # Minimum version of Ruby compatible with Rails 7.0
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.required_ruby_version = ">= 3.0.0"
 
   # Metadata used on gem’s profile page on rubygems.org
   spec.metadata["homepage_uri"] = spec.homepage
