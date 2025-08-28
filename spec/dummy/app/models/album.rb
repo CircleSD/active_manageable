@@ -7,13 +7,7 @@ class Album < ApplicationRecord
   accepts_nested_attributes_for :artist
   accepts_nested_attributes_for :songs, allow_destroy: true
 
-  enum genre: {
-    electronic: 0,
-    dance: 1,
-    rock: 2,
-    indie: 3,
-    pop: 4
-  }
+  enum :genre, {electronic: 0, dance: 1, rock: 2, indie: 3, pop: 4}
 
   validates :name, presence: true
 

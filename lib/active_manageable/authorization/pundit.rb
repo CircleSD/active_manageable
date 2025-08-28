@@ -19,7 +19,7 @@ module ActiveManageable
       end
 
       def authorize_action
-        "#{@current_method}?".to_sym
+        :"#{@current_method}?"
       end
     end
   end

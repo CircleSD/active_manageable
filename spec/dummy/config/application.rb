@@ -33,5 +33,7 @@ module Dummy
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.load_defaults 7.0
   end
 end

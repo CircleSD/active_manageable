@@ -14,8 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/CircleSD/active_manageable"
   spec.license = "MIT"
 
-  # Minimum version of Ruby compatible with Rails 7.0
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.required_ruby_version = ">= 3.0.0"
 
   # Metadata used on gem’s profile page on rubygems.org
   spec.metadata["homepage_uri"] = spec.homepage
@@ -41,17 +40,17 @@ Gem::Specification.new do |spec|
   # including gems that are essential to test and build this gem
 
   # rails dependencies
-  spec.add_dependency "activerecord", ">= 6.0"
-  spec.add_dependency "activesupport", ">= 6.0"
+  spec.add_dependency "activerecord", ">= 7.0"
+  spec.add_dependency "activesupport", ">= 7.0"
 
   # gem dependencies
   spec.add_dependency "rails-i18n"
   spec.add_dependency "flexitime", "~> 1.0"
 
   # test dependencies
-  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "appraisal"
-  spec.add_development_dependency "sqlite3", "~> 1.4.0"
+  spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rails-controller-testing"
   spec.add_development_dependency "factory_bot_rails"
@@ -65,8 +64,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "kaminari"
 
   # linter dependencies
-  spec.add_development_dependency "rubocop", "1.23.0"
+  spec.add_development_dependency "rubocop"
   spec.add_development_dependency "standard"
+  spec.add_development_dependency "standard-rails"
   spec.add_development_dependency "rubocop-rails"
   spec.add_development_dependency "rubocop-rspec"
 
