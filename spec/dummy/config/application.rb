@@ -1,5 +1,8 @@
 require_relative "boot"
 
+# require logger for Rails 7.0
+require "logger"
+
 require "rails"
 # Pick the frameworks you want:
 require "active_model/railtie"
@@ -33,5 +36,7 @@ module Dummy
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.load_defaults 7.0
   end
 end

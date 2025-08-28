@@ -41,17 +41,17 @@ Gem::Specification.new do |spec|
   # including gems that are essential to test and build this gem
 
   # rails dependencies
-  spec.add_dependency "activerecord", ">= 6.0"
-  spec.add_dependency "activesupport", ">= 6.0"
+  spec.add_dependency "activerecord", ">= 7.0"
+  spec.add_dependency "activesupport", ">= 7.0"
 
   # gem dependencies
   spec.add_dependency "rails-i18n"
   spec.add_dependency "flexitime", "~> 1.0"
 
   # test dependencies
-  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "appraisal"
-  spec.add_development_dependency "sqlite3", "~> 1.4.0"
+  spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rails-controller-testing"
   spec.add_development_dependency "factory_bot_rails"
