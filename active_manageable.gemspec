@@ -65,8 +65,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "kaminari"
 
   # linter dependencies
-  spec.add_development_dependency "rubocop", "1.23.0"
+  spec.add_development_dependency "rubocop"
   spec.add_development_dependency "standard"
+  spec.add_development_dependency "standard-rails"
   spec.add_development_dependency "rubocop-rails"
   spec.add_development_dependency "rubocop-rspec"
 

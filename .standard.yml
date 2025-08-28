@@ -1,5 +1,0 @@
-# Standard ruby style guide, linter, and formatter https://github.com/testdouble/standard
-# to check the style of files run:-
-# $ bundle exec standardrb
-ignore:
-  - 'active_manageable.gemspec'

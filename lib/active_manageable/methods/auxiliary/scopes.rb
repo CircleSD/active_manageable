@@ -44,7 +44,7 @@ module ActiveManageable
         def get_scopes(scopes = nil)
           scopes ||= defaults[:scopes]
 
-          Array.wrap(scopes).map do |scope|
+          Array.wrap(scopes).filter_map do |scope|
             case scope
             when Symbol, String
               {scope => []}
@@ -57,7 +57,7 @@ module ActiveManageable
               p_scopes = instance_exec(&scope)
               get_scopes(p_scopes) if p_scopes.present?
             end
-          end.compact.reduce({}, :merge)
+          end.reduce({}, :merge)
         end
       end
     end

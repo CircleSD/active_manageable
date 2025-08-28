@@ -42,7 +42,7 @@ module ActiveManageable
           when Proc
             instance_exec(&method)
           end
-          condition == :if ? result : !result
+          (condition == :if) ? result : !result
         end
       end
     end

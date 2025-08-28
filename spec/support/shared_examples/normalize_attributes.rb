@@ -206,7 +206,7 @@ RSpec.shared_examples "#normalize_attributes" do |method|
     end
 
     def args(method, attributes)
-      method == :update ? {id: album.id, attributes: attributes} : {attributes: attributes}
+      (method == :update) ? {id: album.id, attributes: attributes} : {attributes: attributes}
     end
   end
 end

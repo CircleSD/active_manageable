@@ -1,9 +1,7 @@
-# .rubocop.yml
-
-# Based article from Evil Martians
-# https://evilmartians.com/chronicles/rubocoping-with-legacy-bring-your-ruby-code-up-to-standard
-# referenced in standard readme relating to use of Standard with Rubocop extensions
-# https://github.com/testdouble/standard
+# Inherit Standard's configuration
+inherit_gem:
+  standard: config/base.yml
+  standard-rails: config/base.yml
 
 # We want Exclude directives from different
 # config files to get merged, not overwritten
@@ -11,23 +9,13 @@ inherit_mode:
   merge:
     - Exclude
 
-require:
-  # Performance cops are bundled with Standard
+plugins:
+  - rubocop-rails
   - rubocop-performance
-  # Standard's config uses this custom cop,
-  # so it must be loaded
-  - standard/cop/block_single_line_braces
-
-inherit_gem:
-  standard: config/base.yml
-
-inherit_from:
-  - .rubocop_rails.yml
-  - .rubocop_rspec.yml
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.4.5
   Exclude:
     - "spec/dummy/config/*"
     - "spec/dummy/config/environments/*"
@@ -40,3 +28,8 @@ Style/ClassEqualityComparison:
   Enabled: true
   Exclude:
     - "lib/active_manageable/base.rb"
+
+Style/RedundantParentheses:
+  Enabled: true
+  Exclude:
+    - "lib/active_manageable/methods/auxiliary/model_attributes.rb"
