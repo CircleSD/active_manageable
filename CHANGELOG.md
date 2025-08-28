@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.0 - 2025-08-28
+
+* Add support and test coverage for all minor versions of Rails 7 and Ruby 3
+* Drop support for Rails 6 and Ruby 2.7
+* Use base_label in calling_method method for Ruby 3.4.x compatibility
+
 ## 0.2.0 - 2022-09-27
 
 * Allow the configuration library options to accept a module
